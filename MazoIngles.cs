@@ -35,11 +35,11 @@ namespace carioca
             Random rm = new Random();
             cartas = cartas.OrderBy(a => rm.NextDouble()).ToList();
         }
-        public Mano repartirMano(int nCartasMano)
+        public List<Carta> repartirMano(int nCartasMano)
         {
-            var manoJugador = new Mano() { cartas = this.cartas.Take(nCartasMano).ToList() };
+            var  cartas = this.cartas.Take(nCartasMano).ToList() ;
             this.cartas.RemoveRange(0, nCartasMano);
-            return manoJugador;
+            return cartas;
         }
 
         private void crearMazoSimple(bool usarJokers, enumColorMazo colorMazo)
@@ -56,7 +56,7 @@ namespace carioca
             if (usarJokers)
             {
                 cartas.AddRange(new List<Carta>{
-                        new Carta(enumPinta.Joker,enumColorCarta.color,colorMazo),
+                        new Carta(enumPinta.Joker,enumColorCarta.roja,colorMazo),
                         new Carta(enumPinta.Joker,enumColorCarta.negro,colorMazo)
                     });
             }

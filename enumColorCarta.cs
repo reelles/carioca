@@ -3,6 +3,6 @@
     public enum enumColorCarta
     {
         negro,
-        color
+        roja
     }
 }

@@ -3,6 +3,7 @@ namespace carioca.Partidas
 {
     public enum enumPartida
     {
+        EscalaColor,
         DosTrios ,
         UnTrioUnaEscala,
         DosEscalas,
@@ -11,7 +12,7 @@ namespace carioca.Partidas
         UnTrioDosEscalas,
         TresEscalas,
         CuatroTrios,
-        EscalaColor,
+        
         EscalaSucia,
         EscalaReal
     }

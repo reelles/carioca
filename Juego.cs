@@ -36,11 +36,12 @@ namespace carioca
         }
         public void Iniciar(IPartida partida)
         {
-
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             mazo = new MazoIngles(true, true);
             mazo.barajar();
             Console.WriteLine("Repartiendo manos...");
-            jugadores.ForEach(jugador => jugador.mano = mazo.repartirMano(partida.nCartasMano));
+            jugadores.ForEach(jugador => jugador.mano.cartas = mazo.repartirMano(partida.nCartasMano));
             pila = new MazoIngles();
             pila.cartas.Add(tomarCartaMazo());
             Console.Clear();
@@ -60,11 +61,12 @@ namespace carioca
                 {
                     Console.Clear();
                     //Inicia el Turno
-                    MostrarMano(jugador);
+                    jugador.mano.mostrarMano();
                     Console.WriteLine($"Partida: {partida.tipoPartida}");
-                    
+
                     //se termina el mazo, se conserva la primera de la pila
-                    if (mazo.nCartas == 0) {
+                    if (mazo.nCartas == 0)
+                    {
                         Carta cartaPila = tomarCartaPila();
                         pila.cartas.Reverse();
                         mazo = pila;
@@ -89,7 +91,7 @@ namespace carioca
                     Console.Write("Presione una tecla para continuar...");
                     Console.ReadLine();
                     Console.Clear();
-                    MostrarMano(jugador);
+                    jugador.mano.mostrarMano();
                     AccionesDelTurno(jugador);
                 }
             }
@@ -97,7 +99,7 @@ namespace carioca
 
             void AccionesDelTurno(Jugador jugador)
             {
-                Console.WriteLine("Seleccione la accion a realizar:");
+                Console.WriteLine("Acciones Del Turno");
                 Console.WriteLine("1) Ver Mano");
                 Console.WriteLine("2) Ver Cartas de Jugadores");
                 Console.WriteLine("3) Ordenar mis cartas");
@@ -105,12 +107,23 @@ namespace carioca
                 Console.WriteLine("5) Bajar a oponentes");
                 Console.WriteLine("6) Informacion de partida");
                 Console.WriteLine("7) Terminar Turno");
-                int opcion = int.Parse(Console.ReadLine());
+                Console.Write("Seleccione la accion a realizar(1/7):");
+                int opcion = 0;
+                if (!int.TryParse(Console.ReadLine(), out opcion))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Opcion invalida, debe ingresar un numero.");
+                    Console.Write("Presione una tecla para continuar...");
+                    Console.ReadLine();
+                    Console.Clear();
+                    jugador.mano.mostrarMano();
+                    AccionesDelTurno(jugador);
+                }
                 Console.Clear();
                 switch (opcion)
                 {
                     case 1: //Ver mano jugador
-                        MostrarMano(jugador);
+                        jugador.mano.mostrarMano();
                         AccionesDelTurno(jugador);
                         break;
                     case 2://Ver cartas de jugadores
@@ -119,7 +132,7 @@ namespace carioca
                         break;
                     case 3://Ordenar Cartas del jugador
 
-
+                        jugador.mano.ordenarCartas(partida);
                         AccionesDelTurno(jugador);
                         break;
                     case 4://Bajarse
@@ -132,6 +145,9 @@ namespace carioca
                         break;
                     case 6://Infromacion de partida
                         Console.WriteLine(partida.descripcion);
+
+                        jugador.mano.mostrarMano();
+
                         Console.Write("Presione una tecla para continuar...");
                         Console.ReadLine();
                         Console.Clear();
@@ -142,16 +158,20 @@ namespace carioca
 
                         TerminarTurno(jugador);
                         break;
+                    default:
+                        Console.WriteLine("Opcion invalida, debe ingresar una opcion del 1 al 7.");
+                        Console.Write("Presione una tecla para continuar...");
+                        Console.ReadLine();
+                        Console.Clear();
+                        jugador.mano.mostrarMano();
+                        AccionesDelTurno(jugador);
+                        break;
+
+
                 }
 
             }
-            void MostrarMano(Jugador jugador)
-            {
-                Console.WriteLine($"Jugador {jugador.nJugador + 1} | {jugador.nombre}");
-                Console.WriteLine($"\tMano:");
-                jugador.mano.cartas.ForEach(a => Console.Write($"\t\t{jugador.mano.cartas.IndexOf(a) + 1 }._ {a.nombre} {a.pinta.pinta} {a.pinta.colorCarta}\n"));
-                Console.WriteLine($"\tPuntaje:\n\t\t{jugador.mano.puntajeMano}");
-            }
+
             void TerminarTurno(Jugador jugador)
             {
                 if (jugador.mano.cartas.Count == 0)
@@ -163,19 +183,43 @@ namespace carioca
                     Console.ReadLine();
 
                 }
-                else {
-                    MostrarMano(jugador);
+                else
+                {
+                    jugador.mano.mostrarMano();
                     Console.WriteLine($"Seleccione una Carta para descartar:");
-                    Console.WriteLine($"Ingrese el número({1}/{jugador.mano.cartas.Count()})");
-                    int intCartaSeleccionada = int.Parse(Console.ReadLine()) - 1;
-                    Carta cartaDescartada = jugador.mano.cartas[intCartaSeleccionada];
-                    jugador.mano.cartas.Remove(cartaDescartada);
-                    pila.cartas.Add(cartaDescartada);
-                    Console.Write("Presione una tecla para continuar...");
-                    Console.ReadLine();
+                    Console.Write($"Ingrese el número({1}/{jugador.mano.cartas.Count()}):");
+
+                    int intCartaSeleccionada = 0;
+
+                    if (!int.TryParse(Console.ReadLine(), out intCartaSeleccionada))
+                    {
+                        Console.WriteLine($"Opcion invalida, debe ingresar una opcion del 1/{jugador.mano.cartas.Count()}.");
+                        Console.Write("Presione una tecla para continuar...");
+                        Console.ReadLine();
+                        Console.Clear();
+                        TerminarTurno(jugador);
+                    }
+                    if (intCartaSeleccionada >= 0 && intCartaSeleccionada < jugador.mano.cartas.Count)
+                    {
+
+                        Carta cartaDescartada = jugador.mano.cartas[intCartaSeleccionada];
+
+                        jugador.mano.cartas.Remove(cartaDescartada);
+                        pila.cartas.Add(cartaDescartada);
+                        Console.WriteLine($"La Carta descartada es un: {cartaDescartada.ImprimeCarta()}");
+                        Console.Write("Presione una tecla para continuar...");
+                        Console.ReadLine();
+                    }
+                    else {
+                        Console.WriteLine($"Opcion invalida, debe ingresar una opcion del 1/{jugador.mano.cartas.Count()}.");
+                        Console.Write("Presione una tecla para continuar...");                        
+                        Console.ReadLine();
+                        Console.Clear();
+                        TerminarTurno(jugador);
+                    }
                 }
 
-                
+
             }
         }
 
@@ -183,13 +227,13 @@ namespace carioca
         {
             Carta cartaRecogida = mazo.cartas.Last();
             mazo.cartas.Remove(cartaRecogida);
-            Console.WriteLine($"La Carta recogida es un: {cartaRecogida.nombre} {cartaRecogida.pinta.pinta}");
+            Console.WriteLine($"La Carta recogida es un: {cartaRecogida.ImprimeCarta()}");
             return cartaRecogida;
         }
         public Carta tomarCartaPila()
         {
             Carta cartaRecogida = pila.cartas.Last();
-            Console.WriteLine($"La Carta recogida es un: {cartaRecogida.nombre} {cartaRecogida.pinta.pinta}");
+            Console.WriteLine($"La Carta recogida es un: {cartaRecogida.ImprimeCarta()}");
             pila.cartas.Remove(cartaRecogida);
             return cartaRecogida;
 

@@ -38,7 +38,7 @@ namespace carioca
                 throw new Exception("Jockers deben ser creados indicando su color");
             this.colorMazo = colorMazo;
             this.numero = numero;
-            this.pinta = new PintaCarta(pinta, pinta == enumPinta.Corazon || pinta == enumPinta.Diamante ? enumColorCarta.color : enumColorCarta.negro);
+            this.pinta = new PintaCarta(pinta, pinta == enumPinta.Corazon || pinta == enumPinta.Diamante ? enumColorCarta.roja : enumColorCarta.negro);
 
             switch (pinta)
             {
@@ -74,6 +74,11 @@ namespace carioca
                     break;
             }
 
+        }
+        public string ImprimeCarta()
+        {
+
+            return ($"{this.nombre} {(this.pinta.pinta == enumPinta.Joker ? "" : this.pinta.pinta)} {(this.pinta.pinta == enumPinta.Joker ? this.pinta.colorCarta : "")}");
         }
     }
 }
