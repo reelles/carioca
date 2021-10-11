@@ -7,12 +7,11 @@ namespace carioca
 {
     public class Jugador
     {
-        private int _puntaje { get; set; }
-
+        private int Puntaje { get; set; }
         public string nombre { get; set; }
         public Mano mano { get; set; }
         public int nJugador { get; }
-        public int puntaje { get => _puntaje; }
+        public int puntaje { get => Puntaje; }
         public List<CartasMesa> cartasEnMesa { get; set; }
         public Jugador(int nJugador)
         {
@@ -24,31 +23,27 @@ namespace carioca
         }
         public void calculaPuntajeFinal()
         {
-            _puntaje = +mano.puntajeMano;
+            Puntaje += mano.puntajeMano;
         }
         public class Mano
         {
             private Jugador _jugador { get; set; }
-
-            public Mano(Jugador jugador)
-            {
-                _jugador = jugador;
-            }
             public List<Carta> cartas { get; set; }
             public int puntajeMano
             {
                 get { return cartas.Sum(a => a.valor); }
+            }
+            public Mano(Jugador jugador)
+            {
+                _jugador = jugador;
             }
             public void mostrarMano()
             {
                 Console.WriteLine($"Jugador {_jugador.nJugador + 1} | {_jugador.nombre}");
                 Console.WriteLine($"\tMano:");
                 _jugador.mano.cartas.ToList().ForEach(a =>Console.WriteLine($"\t\t{this._jugador.mano.cartas.IndexOf(a)+1}) {a.ImprimeCarta()}"));
-
                 Console.WriteLine($"\tPuntaje:\n\t\t{_jugador.mano.puntajeMano}");
-
             }
-
             public void ordenarCartas(IPartida partida)
             {
 

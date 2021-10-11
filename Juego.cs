@@ -73,7 +73,7 @@ namespace carioca
                         pila = new MazoIngles();
                         pila.cartas.Add(cartaPila);
                     }
-                    Console.WriteLine($"En la Mesa:\n\t\tMazo:{mazo.nCartas} \tPila:{pila.cartas.Last().nombre} {pila.cartas.Last().pinta.pinta} ({pila.nCartas} cartas)");
+                    Console.WriteLine($"En la Mesa:\n\t\tMazo:{mazo.nCartas} \tPila:{pila.cartas.Last().nombre} ({pila.nCartas} cartas)");
                     Console.WriteLine($"Que hacer?\n1)\tTomar carta de mazo\n2)\tTomar carta de pila");
                     Console.WriteLine("Seleccione una opcion (1,2)");
 
