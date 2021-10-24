@@ -41,7 +41,11 @@ namespace carioca
             mazo = new MazoIngles(true, true);
             mazo.barajar();
             Console.WriteLine("Repartiendo manos...");
-            jugadores.ForEach(jugador => jugador.mano.cartas = mazo.repartirMano(partida.nCartasMano));
+            jugadores.ForEach(jugador =>
+            {
+                jugador.mano.cartas = mazo.repartirMano(partida.nCartasMano);
+                jugador.SetCartasEnMesa(partida.tipoPartida);
+            });
             pila = new MazoIngles();
             pila.cartas.Add(tomarCartaMazo());
             Console.Clear();
@@ -95,7 +99,7 @@ namespace carioca
                     AccionesDelTurno(jugador);
                 }
             }
-            jugadores.ForEach(a => a.calculaPuntajeFinal());
+            jugadores.ForEach(a => a.CalculaPuntajeFinal());
 
             void AccionesDelTurno(Jugador jugador)
             {
@@ -210,9 +214,10 @@ namespace carioca
                         Console.Write("Presione una tecla para continuar...");
                         Console.ReadLine();
                     }
-                    else {
+                    else
+                    {
                         Console.WriteLine($"Opcion invalida, debe ingresar una opcion del 1/{jugador.mano.cartas.Count()}.");
-                        Console.Write("Presione una tecla para continuar...");                        
+                        Console.Write("Presione una tecla para continuar...");
                         Console.ReadLine();
                         Console.Clear();
                         TerminarTurno(jugador);
