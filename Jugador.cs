@@ -13,7 +13,13 @@ namespace carioca
         public int nJugador { get; }
         public int puntaje { get => Puntaje; }
         public List<CartasMesa> CartasEnMesa { get => _cartasEnMesa; set => _cartasEnMesa = value; }
-
+        public bool bajado
+        {
+            get
+            {
+                return CartasEnMesa.All(grupos => grupos.visible);
+            }
+        }
         List<CartasMesa> _cartasEnMesa;
         public Jugador(int nJugador)
         {
@@ -103,14 +109,16 @@ namespace carioca
         {
             for (int i = 0; i < CartasEnMesa.Count; i++)
             {
-                Console.WriteLine($"{i + 1}) {CartasEnMesa[i].tipoGrupo}");
-                if (CartasEnMesa[i].Cartas == null)
-                    Console.Write("Sin Cartas");
+                Console.Write($"\t\t{i + 1}) {CartasEnMesa[i].tipoGrupo}");
+                if (CartasEnMesa[i].Cartas == null || CartasEnMesa[i].Cartas.Count() == 0)
+                    Console.WriteLine("=> Sin Cartas");
                 else
+                {
                     switch (CartasEnMesa[i].tipoGrupo)
                     {
                         case enumTipoGrupo.Trio:
-                            Console.Write($" de {CartasEnMesa[i].Cartas.FirstOrDefault().numero} ");
+                            Console.Write($" de {CartasEnMesa[i].Cartas.FirstOrDefault().numero}");
+                            CartasEnMesa[i].Cartas.ForEach(carta => carta.ImprimeCarta());
                             break;
                         case enumTipoGrupo.EscalaReal:
                         case enumTipoGrupo.Escala:
@@ -120,6 +128,9 @@ namespace carioca
                             Console.Write($" de {CartasEnMesa[i].Cartas.FirstOrDefault().pinta.colorCarta} ");
                             break;
                     }
+                    Console.WriteLine($"({CartasEnMesa[i].Cartas.Count()} cartas)");
+                    CartasEnMesa[i].Cartas.ForEach(carta => Console.WriteLine($"\t\t\t{carta.ImprimeCarta()} "));
+                }
             }
 
         }
@@ -133,7 +144,7 @@ namespace carioca
             public List<Carta> cartas { get; set; }
             public int puntajeMano
             {
-                get { return cartas.Sum(a => a.valor); }
+                get { return cartas.Sum(a => a.valor) + _jugador.CartasEnMesa.Where(a => !a.visible).Sum(a => a.Cartas.Sum(a => a.valor)); }
             }
             public Mano(Jugador jugador)
             {
@@ -144,6 +155,8 @@ namespace carioca
                 Console.WriteLine($"Jugador {_jugador.nJugador + 1} | {_jugador.nombre}");
                 Console.WriteLine($"\tMano:");
                 _jugador.mano.cartas.ToList().ForEach(a => Console.WriteLine($"\t\t{this._jugador.mano.cartas.IndexOf(a) + 1}) {a.ImprimeCarta()}"));
+                Console.WriteLine($"\tEn Mesa (Bajado={_jugador.bajado}):");
+                _jugador.VerCartasEnMesa();
                 Console.WriteLine($"\tPuntaje:\n\t\t{_jugador.mano.puntajeMano}");
             }
             public void ordenarCartas(IPartida partida)
@@ -162,7 +175,9 @@ namespace carioca
                             if (gpCartas.Count() > 2)
                             {
                                 Console.Write("(Trio listo!)");
-                                SetGrupoMesa(gpCartas.ToList());
+                                var addedCarts = SetGrupoMesa(gpCartas.ToList()).ToList();
+                                if (addedCarts != null)
+                                    addedCarts.ForEach(a => cartas.Remove(a));
                             }
                             Console.WriteLine();
                             gpCartas.ToList().ForEach(a => Console.WriteLine($"\t\t{gpCartas.ToList().IndexOf(a) + 1}) {a.ImprimeCarta()}"));
@@ -179,7 +194,9 @@ namespace carioca
                             if (gpCartas.Count() > 2)
                             {
                                 Console.Write("(Escala lista!)");
-                                SetGrupoMesa(gpCartas.ToList());
+                                var addedCarts = SetGrupoMesa(gpCartas.ToList()).ToList();
+                                if (addedCarts != null)
+                                    addedCarts.ForEach(a => cartas.Remove(a));
                             }
                             Console.WriteLine();
                             gpCartas.ToList().ForEach(a => Console.WriteLine($"\t\t{gpCartas.ToList().IndexOf(a) + 1}) {a.ImprimeCarta()}"));
@@ -209,17 +226,19 @@ namespace carioca
                 }
             }
 
-            private void SetGrupoMesa(IList<Carta> gpCartas)
+            private IList<Carta> SetGrupoMesa(IList<Carta> gpCartas)
             {
-                Console.WriteLine("Agregar a carta en mesa? (S/N)");
-                string resp = Console.ReadLine();
+                Console.WriteLine("\t\tAgregar a carta en mesa? (S/N)");
+                string resp = Console.ReadLine().ToUpper();
                 if (resp == "S")
                 {
                     _jugador.VerCartasEnMesa();
-                    Console.WriteLine("Indique a que grupo agregar");
+                    Console.WriteLine("\t\tIndique a que grupo agregar");
                     int nGrupo = int.Parse(Console.ReadLine());
-                    _jugador.CartasEnMesa[nGrupo - 1].AgragarCarta(gpCartas);
+                    return _jugador.CartasEnMesa[nGrupo - 1].AgragarCarta(gpCartas);
                 }
+                else
+                    return null;
             }
         }
     }

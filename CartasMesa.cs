@@ -10,7 +10,9 @@ namespace carioca
         private List<Carta> _cartas { get; set; }
         public List<Carta> Cartas
         {
-            get;
+            get {
+                return _cartas;
+            }
         }
         public bool visible { get; set; }
         public CartasMesa(enumTipoGrupo tipoGrupo)
@@ -37,35 +39,35 @@ namespace carioca
                     switch (tipoGrupo)
                     {
                         case enumTipoGrupo.Trio:
-                            if (_cartas.All(a => a.numero == carta.numero) && !(!visible && (_cartas.Count() < 3)))
+                            if (_cartas.All(a => a.numero == carta.numero) && (!visible && (_cartas.Count() < 3)))
                             {
                                 _cartas.Add(carta);
                                 return carta;
                             }
                             break;
                         case enumTipoGrupo.Escala:
-                            if (_cartas.Any(a => a.pinta.nombre == carta.pinta.nombre && a.numero != carta.numero) && !(!visible && (_cartas.Count() < 4)))
+                            if (_cartas.Any(a => a.pinta.nombre == carta.pinta.nombre && a.numero != carta.numero) && (!visible && (_cartas.Count() < 4)))
                             {
                                 _cartas.Add(carta);
                                 return carta;
                             }
                             break;
                         case enumTipoGrupo.EscalaSucia:
-                            if (_cartas.Any(a=>a.numero != carta.numero) && !(!visible && (_cartas.Count() < 12)))
+                            if (_cartas.Any(a=>a.numero != carta.numero) && (!visible && (_cartas.Count() < 12)))
                             {
                                 _cartas.Add(carta);
                                 return carta;
                             }
                             break;
                         case enumTipoGrupo.EscalaColor:
-                            if (_cartas.Any(a => a.pinta.colorCarta == carta.pinta.colorCarta && a.numero != carta.numero) && !(!visible && (_cartas.Count() < 12)))
+                            if (_cartas.Any(a => a.pinta.colorCarta == carta.pinta.colorCarta && a.numero != carta.numero) && (!visible && (_cartas.Count() < 12)))
                             {
                                 _cartas.Add(carta);
                                 return carta;
                             }
                             break;
                         case enumTipoGrupo.EscalaReal:
-                            if (_cartas.Any(a => a.pinta.nombre == carta.pinta.nombre && a.numero != carta.numero) && !(!visible && (_cartas.Count() < 12)))
+                            if (_cartas.Any(a => a.pinta.nombre == carta.pinta.nombre && a.numero != carta.numero) && (!visible && (_cartas.Count() < 12)))
                             {
                                 _cartas.Add(carta);
                                 return carta;
@@ -84,14 +86,19 @@ namespace carioca
         }
         public IList<Carta> AgragarCarta(IList<Carta> cartas)
         {
+            IList<Carta> resultAddCarta = new List<Carta>();
+
             foreach (Carta carta in cartas)
             {
-                if (this.AgragarCarta(carta) == null)
+                var retCart = this.AgragarCarta(carta);
+                if (retCart == null)
                 {
                     return null;
                 }
+                else
+                    resultAddCarta.Add(carta);
             }
-            return cartas;
+            return resultAddCarta;
         }
 
         public void Revelar()

@@ -103,15 +103,22 @@ namespace carioca
 
             void AccionesDelTurno(Jugador jugador)
             {
+                var tieneJoker = jugador.mano.cartas.Any(cartas => cartas.pinta.nombre == enumPinta.Joker);
+                var acciones = 7;
                 Console.WriteLine("Acciones Del Turno");
                 Console.WriteLine("1) Ver Mano");
                 Console.WriteLine("2) Ver Cartas de Jugadores");
                 Console.WriteLine("3) Ordenar mis cartas");
-                Console.WriteLine("4) Bajarse");
+                if (!jugador.bajado)
+                    Console.WriteLine("4) Bajarse");
                 Console.WriteLine("5) Bajar a oponentes");
                 Console.WriteLine("6) Informacion de partida");
                 Console.WriteLine("7) Terminar Turno");
-                Console.Write("Seleccione la accion a realizar(1/7):");
+                if (tieneJoker) {
+                    Console.WriteLine("8) Uscar Joker");
+                    acciones++;
+                }
+                Console.Write($"Seleccione la accion a realizar(1/{acciones}):");
                 int opcion = 0;
                 if (!int.TryParse(Console.ReadLine(), out opcion))
                 {
@@ -140,6 +147,7 @@ namespace carioca
                         AccionesDelTurno(jugador);
                         break;
                     case 4://Bajarse
+                        
 
                         AccionesDelTurno(jugador);
                         break;
@@ -159,11 +167,16 @@ namespace carioca
                         break;
 
                     case 7://Terminar Turno
+                        TerminarTurno(jugador);
+                        break;
+                    case 8://Usar JOKER
+                        UsarJoker(jugador);
+
 
                         TerminarTurno(jugador);
                         break;
                     default:
-                        Console.WriteLine("Opcion invalida, debe ingresar una opcion del 1 al 7.");
+                        Console.WriteLine($"Opcion invalida, debe ingresar una opcion del 1 al 7.");
                         Console.Write("Presione una tecla para continuar...");
                         Console.ReadLine();
                         Console.Clear();
@@ -203,6 +216,7 @@ namespace carioca
                         Console.Clear();
                         TerminarTurno(jugador);
                     }
+                    intCartaSeleccionada--;
                     if (intCartaSeleccionada >= 0 && intCartaSeleccionada < jugador.mano.cartas.Count)
                     {
 
@@ -226,6 +240,38 @@ namespace carioca
 
 
             }
+        }
+
+        private void UsarJoker(Jugador jugador)
+        {
+            Console.Clear();
+
+            Console.WriteLine("Seleccione el Joker a utilizar:");
+            var jokersJugador = jugador.mano.cartas.Where(carta => carta.pinta.nombre == enumPinta.Joker).ToList();
+            jokersJugador.ForEach(a => Console.WriteLine($"\t\t{jokersJugador.IndexOf(a) + 1}) {a.ImprimeCarta()}"));
+            int intCartaSeleccionada = 0;
+            if (!int.TryParse(Console.ReadLine(), out intCartaSeleccionada))
+            {
+                Console.WriteLine($"Opcion invalida, debe ingresar una opcion del 1/{jokersJugador.Count()}.");
+                Console.Write("Presione una tecla para continuar...");
+                Console.ReadKey();
+                UsarJoker(jugador);
+            }
+            else if (intCartaSeleccionada > 0 && intCartaSeleccionada < jokersJugador.Count())
+            {
+                //TODO: Implementar uso de JOKERS
+
+
+            }
+            else {
+                Console.WriteLine($"Opcion invalida, debe ingresar una opcion del 1/{jokersJugador.Count()}.");
+                Console.Write("Presione una tecla para continuar...");
+                Console.ReadKey();
+                UsarJoker(jugador);
+            }
+
+
+
         }
 
         public Carta tomarCartaMazo()
