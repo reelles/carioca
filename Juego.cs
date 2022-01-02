@@ -109,8 +109,11 @@ namespace carioca
                 Console.WriteLine("1) Ver Mano");
                 Console.WriteLine("2) Ver Cartas de Jugadores");
                 Console.WriteLine("3) Ordenar mis cartas");
-                if (!jugador.bajado)
+                if (jugador.PuedeBajarse())
                     Console.WriteLine("4) Bajarse");
+                else
+                    Console.WriteLine("4) Agregar a Grupo en Mesa");
+
                 Console.WriteLine("5) Bajar a oponentes");
                 Console.WriteLine("6) Informacion de partida");
                 Console.WriteLine("7) Terminar Turno");
@@ -146,9 +149,25 @@ namespace carioca
                         jugador.mano.ordenarCartas(partida);
                         AccionesDelTurno(jugador);
                         break;
-                    case 4://Bajarse
-                        
+                    case 4://Bajarse o Grupo
+                        if (jugador.PuedeBajarse())
+                        {
+                            jugador.CartasEnMesa.ForEach(a => a.Revelar());
+                        }
+                        else
+                        {
+                            jugador.VerCartasEnMesa();
+                            Console.WriteLine("Indique a que grupo agregar");
+                            int nGrupo = int.Parse(Console.ReadLine());
+                            jugador.mano.mostrarMano();
+                            Console.WriteLine("Indique que carga bajar");
+                            int nCarta = int.Parse(Console.ReadLine());
 
+                            if (jugador.mano.cartas[nCarta - 1] == jugador.CartasEnMesa[nGrupo - 1].AgragarCarta(jugador.mano.cartas[nCarta - 1]))
+                                jugador.mano.cartas.RemoveAt(nCarta - 1);
+                            else
+                                Console.WriteLine("La Carta no cumple con los requisitos del grupo");
+                        }
                         AccionesDelTurno(jugador);
                         break;
                     case 5://Bajar al oponente
@@ -257,7 +276,7 @@ namespace carioca
                 Console.ReadKey();
                 UsarJoker(jugador);
             }
-            else if (intCartaSeleccionada > 0 && intCartaSeleccionada < jokersJugador.Count())
+            else if (intCartaSeleccionada > 0 && intCartaSeleccionada <= jokersJugador.Count())
             {
                 //TODO: Implementar uso de JOKERS
 
@@ -269,9 +288,6 @@ namespace carioca
                 Console.ReadKey();
                 UsarJoker(jugador);
             }
-
-
-
         }
 
         public Carta tomarCartaMazo()

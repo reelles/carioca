@@ -10,7 +10,8 @@ namespace carioca
         private List<Carta> _cartas { get; set; }
         public List<Carta> Cartas
         {
-            get {
+            get
+            {
                 return _cartas;
             }
         }
@@ -53,7 +54,7 @@ namespace carioca
                             }
                             break;
                         case enumTipoGrupo.EscalaSucia:
-                            if (_cartas.Any(a=>a.numero != carta.numero) && (!visible && (_cartas.Count() < 12)))
+                            if (_cartas.Any(a => a.numero != carta.numero) && (!visible && (_cartas.Count() < 12)))
                             {
                                 _cartas.Add(carta);
                                 return carta;
@@ -91,23 +92,17 @@ namespace carioca
             foreach (Carta carta in cartas)
             {
                 var retCart = this.AgragarCarta(carta);
-                if (retCart == null)
-                {
-                    return null;
-                }
-                else
+                if (retCart != null)
                     resultAddCarta.Add(carta);
             }
             return resultAddCarta;
         }
 
-        public void Revelar()
-        {
+        public bool PuedeRevelar() {
             switch (this.tipoGrupo)
             {
                 case enumTipoGrupo.Trio:
-                    visible = _cartas.Count() == 3 && _cartas.GroupBy(a => a.numero).Count() == 1;
-                    break;
+                    return _cartas.Count == 3 && (_cartas.GroupBy(a => a.numero).Count() == 1 || ( _cartas.GroupBy(a => a.numero).Count() == 2 && _cartas.Any(a=> a.pinta.nombre == enumPinta.Joker )));
                 case enumTipoGrupo.Escala:
                     if (_cartas.Count() == 4)
                     {
@@ -121,27 +116,30 @@ namespace carioca
                             lowCard++;
                             if (lowCard != carta.numero)
                             {
-                                visible = false;
-                                break;
+                                return false;
                             }
                         }
                     }
                     else
                     {
-                        visible = false;
+                        return false;
                     }
-                    visible = _cartas.Select(a => a.numero).Distinct().Count() == _cartas.Count() && _cartas.GroupBy(a => a.pinta.nombre).Count() == 1;
-                    break;
+                    return _cartas.Select(a => a.numero).Distinct().Count() == _cartas.Count() && _cartas.GroupBy(a => a.pinta.nombre).Count() == 1;
                 case enumTipoGrupo.EscalaSucia:
-                    visible = _cartas.Select(a => a.numero).Distinct().Count() == 13;
-                    break;
+                    return _cartas.Select(a => a.numero).Distinct().Count() == 13;
+
                 case enumTipoGrupo.EscalaColor:
-                    visible = _cartas.Select(a => a.numero).Distinct().Count() == 13 && _cartas.GroupBy(a => a.pinta.colorCarta).Count() == 1;
-                    break;
+                    return _cartas.Select(a => a.numero).Distinct().Count() == 13 && _cartas.GroupBy(a => a.pinta.colorCarta).Count() == 1;
+
                 case enumTipoGrupo.EscalaReal:
-                    visible = _cartas.Select(a => a.numero).Distinct().Count() == 13 && _cartas.GroupBy(a => a.pinta.nombre).Count() == 1;
-                    break;
+                    return _cartas.Select(a => a.numero).Distinct().Count() == 13 && _cartas.GroupBy(a => a.pinta.nombre).Count() == 1;
+                default:
+                    return false;
             }
+        }
+        public void Revelar()
+        {
+            visible = PuedeRevelar();
 
             if (!visible)
             {

@@ -29,6 +29,7 @@ namespace carioca
             this.nJugador = nJugador;
             this.mano = new Mano(this);
         }
+        public bool PuedeBajarse() => this.CartasEnMesa.All(a => a.PuedeRevelar());
         public List<CartasMesa> SetCartasEnMesa(enumPartida tipoPartida)
         {
             if (null == CartasEnMesa)
